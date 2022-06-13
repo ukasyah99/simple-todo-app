@@ -1,9 +1,11 @@
 import { Box, SimpleGrid, Text, useDisclosure } from "@chakra-ui/react";
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import AddForm from "./components/AddForm";
 import DeleteAlertModal from "./components/DeleteAlertModal";
 import EditFormModal from "./components/EditFormModal";
 import TodoItem from "./components/TodoItem";
+import { API_BASE_URL } from "./config";
 
 const App = () => {
   const [items, setItems] = useState([]);
@@ -11,8 +13,16 @@ const App = () => {
   const editModal = useDisclosure();
   const deleteModal = useDisclosure();
 
-  const handleAddItem = (item) => {
-    setItems(items => [item, ...items]);
+  useEffect(() => {
+    (async () => {
+      const result = await axios.get(API_BASE_URL + '/todo');
+      setItems(result.data.data);
+    })();
+  }, []);
+
+  const handleAddItem = async (item) => {
+    const result = await axios.post(API_BASE_URL + '/todo', item);
+    setItems(items => [result.data.data, ...items]);
   };
 
   const handleEditItem = (id) => {
@@ -25,12 +35,16 @@ const App = () => {
     deleteModal.onOpen();
   };
 
-  const handleEditSuccess = (newItem) => {
+  const handleEditSuccess = async (newItem) => {
+    await axios.put(API_BASE_URL + '/todo/' + newItem.id, {
+      title: newItem.title,
+    });
     const newItems = items.map(item => item.id === newItem.id ? newItem : item);
     setItems(newItems);
   };
 
-  const handleDeleteSuccess = () => {
+  const handleDeleteSuccess = async () => {
+    await axios.delete(API_BASE_URL + '/todo/' + activeItem.id);
     const newItems = items.filter(item => item.id !== activeItem.id);
     setItems(newItems);
     deleteModal.onClose();

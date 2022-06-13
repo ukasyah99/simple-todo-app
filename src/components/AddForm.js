@@ -1,6 +1,5 @@
 import { Button, Flex, Input } from "@chakra-ui/react"
 import { useState } from "react";
-import { nanoid } from "nanoid";
 
 const AddForm = ({ onSubmit }) => {
   const [title, setTitle] = useState('');
@@ -8,7 +7,7 @@ const AddForm = ({ onSubmit }) => {
   const handleSubmit = e => {
     e.preventDefault();
     setTitle('');
-    onSubmit({ id: nanoid(), title });
+    onSubmit({ title });
   };
 
   const handleTitleChange = e => {
